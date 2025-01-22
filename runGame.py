@@ -9,13 +9,15 @@ font = pyg.font.Font('font/Pixeltype.ttf', 50)
 
 skySurf = pyg.image.load('graphics/Sky.png').convert()
 groundSurf = pyg.image.load('graphics/ground.png').convert()
-textSurf = font.render('Running game', True, 'black')
+textSurf = font.render('Running game', True, (64,64,64))
 textRect = textSurf.get_rect(topleft = (300, 100))
 snailSurf = pyg.image.load('graphics/snail/snail1.png').convert_alpha()
 snailXPos = 600
 
 plrSurf = pyg.image.load('graphics/player/player_walk_1.png').convert_alpha()
 plrRect = plrSurf.get_rect(midbottom = (80, 300))
+plrGrav = 0
+
 snailRect = snailSurf.get_rect(midbottom = (600, 300))
 
 while 1:
@@ -23,21 +25,25 @@ while 1:
         if e.type == pyg.QUIT:
             pyg.quit()
             exit()
-##        if e.type == pyg.MOUSEMOTION:
-##            if plrRect.collidepoint(e.pos):
-##                print('collision')
+        if plrRect.collidepoint(pyg.mouse.get_pos()):
+            if pyg.mouse.get_pressed()[0]:
+                plrGrav -= 20
+        if e.type == pyg.KEYDOWN:
+            if e.key == pyg.K_SPACE:
+                plrGrav = -20
+              
     src.blit(skySurf, (0,0))
     src.blit(groundSurf, (0, 300))
-    pyg.draw.rect(src, 'Pink', textRect)
-    pyg.draw.rect(src, 'Pink', textRect, 6)
+    pyg.draw.rect(src, '#c0e8ec', textRect)
+    pyg.draw.rect(src, '#c0e8ec', textRect, 6)
     src.blit(textSurf, textRect)
     src.blit(snailSurf, snailRect)
     snailRect.x -= 4
-    src.blit(plrSurf, plrRect)
 
-    mousePos = pyg.mouse.get_pos()
-##    if plrRect.collidepoint(mousePos):
-##        print(pyg.mouse.get_pressed())
+    plrGrav += 1
+    plrRect.y += plrGrav
+    if plrRect.bottom >= 300: plrRect.bottom = 300
+    src.blit(plrSurf, plrRect)
     
     pyg.display.update()
     clock.tick(60)
