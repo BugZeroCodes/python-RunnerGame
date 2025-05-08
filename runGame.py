@@ -55,8 +55,16 @@ groundSurf = pyg.image.load('graphics/ground.png').convert()
 ##textRect = textSurf.get_rect(topleft = (300, 100))
 
 # Obstacles
-snailSurf = pyg.image.load('graphics/snail/snail1.png').convert_alpha()
-flySurf = pyg.image.load('graphics/Fly/Fly1.png').convert_alpha()
+snailFrame1 = pyg.image.load('graphics/snail/snail1.png').convert_alpha()
+snailFrame2 = pyg.image.load('graphics/snail/snail2.png').convert_alpha()
+snailFrames = [snailFrame1, snailFrame2]
+snailIndex = 0
+snailSurf = snailFrames[snailIndex]
+flyFrame1 = pyg.image.load('graphics/Fly/Fly1.png').convert_alpha()
+flyFrame2 = pyg.image.load('graphics/Fly/Fly2.png').convert_alpha()
+flyFrames = [flyFrame1, flyFrame2]
+flyIndex = 0
+flySurf = flyFrames[flyIndex]
 obstacleList = []
 
 # player stuff
@@ -84,6 +92,12 @@ messageRect = gameMessage.get_rect(center = (400, 320))
 obstacleTimer = pyg.USEREVENT + 1
 pyg.time.set_timer(obstacleTimer, 900)
 
+snailAnimTimer = pyg.USEREVENT + 2
+pyg.time.set_timer(snailAnimTimer, 500)
+
+flyAnimTimer = pyg.USEREVENT + 3
+pyg.time.set_timer(flyAnimTimer, 200)
+
 
 while 1:
     for e in pyg.event.get():
@@ -103,12 +117,18 @@ while 1:
             if e.type == pyg.KEYDOWN and e.key == pyg.K_SPACE:
                 gameState = 1
                 startTime = pyg.time.get_ticks()
-
-        if e.type == obstacleTimer and gameState: # Add an obstacle; a snail, or a fly
-            if randint(0, 2):
-                obstacleList.append(snailSurf.get_rect(bottomright = (randint(900, 1100), 300)))
-            else:
-                obstacleList.append(flySurf.get_rect(bottomright = (randint(900, 1100), 210)))
+        if gameState:
+            if e.type == obstacleTimer: # Add an obstacle; a snail, or a fly
+                if randint(0, 2):
+                    obstacleList.append(snailSurf.get_rect(bottomright = (randint(900, 1100), 300)))
+                else:
+                    obstacleList.append(flySurf.get_rect(bottomright = (randint(900, 1100), 210)))
+            if e.type == snailAnimTimer: # Animate a snail
+                snailIndex = 1 if snailIndex == 0 else 0
+                snailSurf = snailFrames[snailIndex]
+            if e.type == flyAnimTimer: # Animate a fly
+                flyIndex = 1 if flyIndex == 0 else 0
+                flySurf = flyFrames[flyIndex]
     if gameState:
       src.blit(skySurf, (0,0))
       src.blit(groundSurf, (0, 300))
